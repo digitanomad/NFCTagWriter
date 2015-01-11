@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="9"
+        android:minSdkVersion="14"
         android:targetSdkVersion="19" />
     
     <!-- NFC 애플리케이션을 만들 때는 사용권한을 매니페스트에 등록해야 함. -->
@@ -33,6 +33,8 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+        
+        <activity android:name="com.digitanomad.nfctagwriter.NFCTagPush"></activity>
     </application>
 
 </manifest>

@@ -11,6 +11,10 @@ import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -23,6 +27,9 @@ public class NFCTagWriter extends Activity {
 
 	public static final int TYPE_TEXT = 1;
 	public static final int TYPE_URI = 2;
+	
+	public static final int REQ_CODE_PUSH = 1001;
+	public static final int SHOW_PUSH_CONFIRM = 2001;
 
 	EditText messageInput;
 	TextView messageOutput;
@@ -31,6 +38,8 @@ public class NFCTagWriter extends Activity {
 	RadioGroup rgroup01;
 	RadioButton rbutton01;
 	RadioButton rbutton02;
+	
+	NdefMessage mMessage;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +92,7 @@ public class NFCTagWriter extends Activity {
 		}
 
 		// NdefMessage 생성자는 NdefRecord 배열 객체를 파라미터로 전달받는다.
-		NdefMessage mMessage = new NdefMessage(records);
+		mMessage = new NdefMessage(records);
 		return mMessage;
 	}
 
@@ -132,6 +141,41 @@ public class NFCTagWriter extends Activity {
 			tagOutput.append(recordStr);
 			tagOutput.invalidate();
 		}
+		
+		showDialog(SHOW_PUSH_CONFIRM);
 	}
 
+	
+	@Override
+	@Deprecated
+	protected Dialog onCreateDialog(int id) {
+		AlertDialog.Builder builder;
+		switch (id) {
+		case SHOW_PUSH_CONFIRM:
+			builder = new AlertDialog.Builder(this);
+			builder.setTitle("NFC 태그 전송");
+			builder.setMessage("NFC 태그를 전송하시겠습니까?");
+			builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent newIntent = new Intent(getApplicationContext(), NFCTagPush.class);
+					newIntent.putExtra("tag", mMessage);
+					startActivityForResult(newIntent, REQ_CODE_PUSH);
+				}
+			});
+			builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {}
+			});
+			
+			return builder.create();
+
+		default:
+			break;
+		}
+		
+		return null;
+	}
 }
